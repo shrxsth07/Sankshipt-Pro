@@ -1,0 +1,47 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Sankshipt-An Article Platform
+        link(rel='stylesheet' href='/bowwer_components/bootstrap/dist/css/bootstrap.css')
+        link(rel='stylesheet' href='/css/style1.css')
+        style 
+            include ./index.css
+    body 
+        block body 
+            nav#navbar
+                div#logo.ion
+                        img(src="/static/img/logo.png",alt="Error",height="50px",width="200px")  
+                ul.ion
+                    
+                    li #[a(href="/") Home] 
+                    li #[a(href="/articles/about") About us] 
+                    li #[a(href="/articles/contact") Contact us] 
+                    
+                        
+                    
+            if user
+                ul.digital
+                    li.btn.btn-danger.logout #[a(href='/users/logout') Logout]
+            else
+                ul.digital
+                    li.btn.btn-primary.register #[a(href="/users/register") Register]
+                    li.btn.btn-primary.logout #[a(href="/users/login") Login]
+        //- .container
+            != messages('messages', locals)
+
+            if errors 
+                each error, i in errors 
+                    div(class="alertalert=danger") #{error.msg}
+        if errors 
+            each error, i in errors 
+                div.container(class='alert alert-danger') #{error}
+        block content 
+        
+        footer
+            div.foot ©Copright [2023] Sankshipt. All rights reserved.
+        script(src='/bowwer_components/bootstrap/dist/js/bootstrap.js')
+        script(src='/bowwer_components/jQuery/dist/jquery.js')
+        script(src='/js/main.js')

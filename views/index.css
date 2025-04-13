@@ -1,0 +1,239 @@
+body {
+    background-color: bisque;
+}
+
+#navbar {
+    /* margin-top: -17px; */
+    background-color: white;
+    height: 70px;
+}
+
+#logo {
+    display: relative;
+    margin-left: 15px;
+    padding-top: 12px;
+    /* margin-top: 30px; */
+}
+
+#navbar ul {
+    display: flex;
+    justify-content: center;
+    margin-top: -45px;
+}
+
+#navbar li {
+    list-style: none;
+}
+
+#navbar li a {
+    text-decoration: none;
+    padding: 25px 25px;
+    font-size: 23px;
+    color: black;
+    font-family: cursive;
+    font-weight: bold;
+    margin-top: -50px;
+}
+
+#navbar li a:hover {
+    color: blue
+}
+
+.ion {
+    display: flex;
+}
+
+.digital li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    padding: 15px 15px;
+    align-items: center;
+}
+
+.register {
+    position: absolute;
+    /* align-items: center; */
+    margin-left: 80%;
+    margin-top: -3.6%;
+}
+
+.logout {
+    position: absolute;
+    margin-left: 90%;
+    margin-top: -3.6%;
+}
+
+.heading {
+    color: maroon;
+    font-family: cursive;
+    font-weight: bold;
+    text-align: center;
+    font-size: 60px;
+}
+
+.para {
+    font-weight: bold;
+    text-align: center;
+    font-family: cursive;
+    font-size: 24px;
+    width: 70%;
+    margin-left: 15%;
+}
+
+.para2 {
+    color: maroon;
+    font-family: cursive;
+    font-weight: bold;
+    text-align: center;
+    font-size: 40px;
+}
+
+.reg input {
+    padding: 0px 5px;
+    width: 40%;
+    border: 2px solid green;
+}
+
+.reg textarea {
+    padding: 0px 5px;
+    width: 40%;
+    border: 2px solid green;
+    height: 300px;
+}
+
+.cont2 {
+    color: grey;
+}
+
+.final {
+    background-color: white;
+    margin-left: 14%;
+    margin-right: 14%;
+    padding: 10px 10px;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.cont3 {
+    color: grey;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.reg label {
+    font-weight: bold;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 23px;
+    margin-left: 30%;
+}
+
+#regsubmit {
+    font-weight: bold;
+    padding: 0px 10px;
+    width: 6%;
+    margin-left: 47%;
+    margin-top: 1%;
+}
+
+.data {
+    text-align: center;
+    font-weight: bold;
+    font-family: cursive;
+    font-size: 18px;
+}
+
+.s {
+    /* height: 100%; */
+    display: flex;
+}
+
+.addnew {
+    font-weight: bold;
+    margin-left: 30%;
+}
+
+.m {
+    background-color: black;
+    margin-left: 1%;
+    padding: 10px 20px;
+    color: white;
+    width: 25%;
+    position: absolute;
+    height: 80%;
+    border-radius: 5px;
+}
+
+.det {
+    font-weight: bold;
+    font-size: 20px;
+    padding: 5px 5px;
+}
+
+.m1 {
+    background-color: white;
+    margin-left: 27%;
+    padding: 10px 20px;
+    width: 70%;
+    border-radius: 5px;
+}
+
+.li1 {
+    list-style: none;
+    /* height: 40px; */
+    border: 1px solid grey;
+    box-shadow: 2px 2px 5px grey;
+    padding: 15px 10px;
+    width: 100%;
+    margin-bottom: 2%;
+}
+
+.m1head {
+    color: maroon;
+    font-family: cursive;
+    font-weight: bold;
+}
+
+.btn1 {
+    /* position: absolute; */
+    font-weight: bold;
+    padding: 5px 15px;
+    /* margin-left: 73%; */
+    /* margin-top: -9.1%; */
+}
+
+.btn2 {
+    /* position: relative; */
+    font-weight: bold;
+    padding: 5px 15px;
+    margin-left: 2%;
+    top: 0;
+}
+
+.anchor {
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: cursive;
+}
+
+.li1 a:hover {
+    color: blue;
+}
+
+.foot {
+    color: white;
+    background-color: black;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    /* background-color: #f8f8f8; */
+    padding: 10px;
+    text-align: center;
+}
+
+.small {
+    margin-left: 30%;
+}

@@ -1,0 +1,30 @@
+extend layout 
+
+block content
+ div.s
+    
+    div.m
+        if user
+            h4 You are logged in as...
+            hr(color='grey')
+            hr(color='grey')
+            div.det Username: 
+                span=user.username
+            div.det Email: 
+                span=user.email
+            br
+            br
+            hr(color='grey')
+            hr(color='grey')
+            div.data Now you can also add, edit and delete your articles
+            br
+            a.btn.btn-success.addnew(href="/articles/add") Add Article
+        else 
+            div.data Kindly login if you already have an account or register to create a new account to add articles...
+    div.m1
+        h3.m1head Here are the collection of articles
+        ul.ul1
+            each article, i in articles
+                li.li1
+                    a(href="/articles/"+article._id, class='anchor')=article.title
+                    

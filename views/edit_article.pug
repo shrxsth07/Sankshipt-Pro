@@ -1,0 +1,17 @@
+extend layout 
+
+block content
+    h1.para2 Edit Your Article...
+    hr.para(color="grey")
+    form.reg(method='POST', action='/articles/edit/'+article._id)
+      .form-group 
+        label Title: 
+        input.form-control.container(name='title', type='text',value=article.title)
+
+        //- label Author: 
+        //- input(name='author', type='text',value=article.author)
+      .form-group 
+        label Body: 
+        textarea.form-control.container(name='Body')=article.body
+      .form-group 
+        input.btn.btn-secondary#regsubmit(type='submit', value='Submit')

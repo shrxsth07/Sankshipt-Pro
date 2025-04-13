@@ -1,0 +1,15 @@
+extend layout 
+
+block content
+    h1.para2 Please Login...
+    hr.para(color="grey")
+    form.reg(method='POST', action='/users/login')
+      
+      .form-group
+        label Username: 
+        input.form-control.container(name='username', type='text')
+      .form-group
+        label Password: 
+        input.form-control.container(name='password', type='password')
+      .form-group
+        input.btn.btn-primary#regsubmit(type='submit', value='Submit')

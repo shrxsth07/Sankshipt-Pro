@@ -1,0 +1,18 @@
+extends layout 
+
+block content 
+    div.final
+        h1.cont=article.title 
+        
+        div.cont.cont2 Written by 
+            span.cont3 #{author}
+        
+        if user 
+            if user.id == article.author
+                a.btn.btn-success.btn1(href='/articles/edit/'+article._id) Edit
+            
+                a.btn.btn-danger#delete-article.btn2(href='#', data-id= article._id) Delete
+        hr(color="grey")
+        div.cont.cont4=article.body
+    
+    

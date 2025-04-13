@@ -1,0 +1,28 @@
+extend layout 
+
+block content
+    h1.para2 Please Register...
+    
+    hr.para(color="grey")
+    form.reg(method='POST', action='/users/register')
+      .form-group
+        label Name:
+        input.form-control.container(name='name', type='text')
+      .form-group
+        label Email:
+        input.form-control.container(name='email', type='text')
+      #form-group
+        label Username: 
+        input.form-control.container(name='username', type='text')
+      .form-group 
+        label Password:
+        input.form-control.container(name='password', type='password')
+        small.small *password should be of min 8 characters
+            
+      .form-group
+        label Confirm Password:
+        input.form-control.container(name='password2', type='password')
+      .form-group
+        
+        input.btn.btn-primary#regsubmit(type='submit', value='Submit')
+    

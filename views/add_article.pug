@@ -1,0 +1,16 @@
+extend layout 
+
+block content
+    h1.para2 Add your article...
+    hr.para(color="grey")
+    form.reg(method='POST', action='/articles/add')
+       
+      .form-group 
+        label Title: 
+        input.form-control.container(name='title', type='text')
+      
+      .form-group
+        label Body: 
+        textarea.form-control.container(name='Body',height = '300px')
+      .form-group
+        input.btn.btn-primary#regsubmit(type='submit', value='Submit')
