@@ -1,144 +1,98 @@
-// console.log("Hello world");
-const express = require('express')
-    // const flash = require('connect-flash')
-    // const session = require('express-session')
-const path = require('path')
-    // const expressMessage = require('express-messages')
+const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const session = require('express-session');
+const flash = require('connect-flash');
+const expressMessages = require('express-messages');
+const passport = require('passport');
+const mongoose = require('mongoose');
 
-const config = require('./config/database');
-const passport = require('passport')
-mongoose.set('debug', true);
+// Connect to MongoDB
+mongoose.connect('mongodb://127.0.0.1/sankshipt', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+const db = mongoose.connection;
 
-
-mongoose.connect('mongodb://127.0.0.1/sankshipt')
-
-let db = mongoose.connection;
+db.on('error', (err) => {
+  console.log(err);
+});
 
 db.once('open', () => {
-        console.log("Connected to MongoDB");
-    })
-    //error detect in db
-db.on('error', (err) => {
-    console.log(err);
-})
-const app = express()
+  console.log('Connected to MongoDB');
+});
 
+// Init App
+const app = express();
 
-//view engine detup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug')
-app.use('/static', express.static('static'))
-app.use(express.static(path.join(__dirname, 'files')))
-
-
-app.use(bodyParser.urlencoded({ extended: false }))
-
-app.use(bodyParser.json())
-
-//Express Session
-app.use(session({
-    secret: 'keyboard cat',
-    resave: true,
-    saveUninitialized: true
-        // cookie: { secure: true }
-}))
-
-
-
-// Express Messages Middleware
-// app.use(flash());
-// app.use(function(req, res, next) {
-//     res.locals.messages = require('express-messages')(req, res);
-//     next();
-// });
-
-// app.use(
-//         // body('author').notEmpty().withMessage('Author is required'),
-//         // body('Body').notEmpty().withMessage('Body is required')
-//     )
-//     // Your routes and other middleware
-
-// Error handling middleware
-// app.use((req, res, next) => {
-//     // Handle validation errors
-//     // req.checkBody('Body', 'Body is required').isEmpty();
-//     const errors = validationResult(req)
-//     if (!errors.isEmpty()) {
-//         // Format and send validation error response
-//         return res.status(422).json({ errors: errors.array() });
-//     }
-//     next();
-//     // Handle other errors
-//     // ...
-// });
-
-// Start the server
-
-
-
-
-
-// app.use(
-//     body().isArray().withMessage('Invalid data format')
-//     // Add more validation rules as needed
-// );
-// app.use((err, req, res, next) => {
-//     // Handle validation errors
-//     if (err instanceof validationResult) {
-//         return res.status(422).json({ errors: err.array() });
-//     }
-//     // Handle other errors
-//     // ...
-// });
-
-
-// //Models Bringing
-
-
-
-
+// Bring in Models
 let Article = require('./models/article');
 
+// Load View Engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
+// Set Public Folder(s)
+app.use('/static', express.static('static'));
+app.use(express.static(path.join(__dirname, 'files')));
+
+// Body Parser Middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// Express Session Middleware
+app.use(session({
+  secret: 'keyboard cat',
+  resave: true,
+  saveUninitialized: true,
+}));
+
+// Connect Flash Middleware
+app.use(flash());
+
+// Express Messages Middleware (must come after flash)
+app.use((req, res, next) => {
+  res.locals.messages = expressMessages(req, res);
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  next();
+});
+
+// Passport Config
 require('./config/passport')(passport);
+
+// Passport Middleware
 app.use(passport.initialize());
 app.use(passport.session());
-// initializePassport(passport);
-app.get('*', (req, res, next) => {
-        res.locals.user = req.user || null;
-        next();
-    })
-    //Routes
-app.get('/', (req, res) => {
-    Article.find().maxTimeMS(20000)
-        .then((results) => {
-            // Process the results
-            res.render('index', {
 
-                articles: results
-            })
-        })
-        .catch((error) => {
-            // Handle any errors
-            console.error(error);
-        });
+// Global User variable
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
+// Home Route
+app.get('/', async (req, res) => {
+  try {
+    const articles = await Article.find().lean();
+    res.render('index', {
+      title: 'Articles',
+      articles: articles,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
 
-})
-
-
-//Add Route
+// Route Files
 let articles = require('./routes/articles');
+let users = require('./routes/users');
 app.use('/articles', articles);
+app.use('/users', users);
 
-let userRouter = require('./routes/users');
-app.use('/users', userRouter);
-
-
-//Server Listen
-app.listen(process.env.port||3000, () => {
-    console.log("Server started on port 3000...")
+// Start Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}...`);
 });

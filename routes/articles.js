@@ -1,210 +1,125 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const path = require('path')
-    // const expressMessage = require('express-messages')
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-mongoose.set('debug', true);
-
-
-mongoose.connect('mongodb://127.0.0.1/sankshipt')
-
-let db = mongoose.connection;
-
-db.once('open', () => {
-        console.log("Connected to MongoDB");
-    })
-    //error detect in db
-db.on('error', (err) => {
-    console.log(err);
-})
-const app = express()
-
-
-//view engine detup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug')
-app.use('/static', express.static('static'))
-app.use(express.static(path.join(__dirname, 'files')))
-
-
-app.use(bodyParser.urlencoded({ extended: false }))
-
-app.use(bodyParser.json())
 
 let Article = require('../models/article');
-let User = require('../models/user')
+let User = require('../models/user');
 
+// Middleware
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.json());
+
+// Auth middleware
+function ensureAuthentication(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  res.redirect('/users/login');
+}
+
+// View routes
 router.get('/add', ensureAuthentication, (req, res) => {
-    res.render('add_article', {
-        title: 'Add Artticle'
-    })
-})
-
-router.get('/about', (req, res) => {
-    res.render('about')
-})
-
-router.get('/contact', (req, res) => {
-        res.render('contact')
-    })
-    //Add submit posts
-router.post('/add', [
-    body('title', 'Title is required').notEmpty(),
-    // body('author', 'Author is required').notEmpty(),
-    body('Body', 'Body is required').notEmpty(),
-], (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        const errorMessages = errors.array().map(error => error.msg);
-        console.log(errorMessages);
-        res.render('add_article', {
-            title: 'Add Artticle',
-            errors: errors.array().map(error => error.msg)
-        })
-        return res.status(400).json({ errors: errors.array() });
-    }
-    let article = new Article();
-    article.title = req.body.title;
-    article.author = req.user._id;
-    article.body = req.body.Body;
-    // console.log(req.body.title);
-
-    // article.save(function(err) {
-    //     if (err) {
-    //         console.log(err);
-    //         return;
-    //     } else {
-    //         res.redirect('/')
-    //     }
-    // })
-    article.validate()
-        .then(() => {
-            article.save()
-                .then(() => {
-                    // console.log('New article added');
-                    // req.flash('success', 'Article Added');
-                    res.redirect('/');
-
-                })
-                .catch((error) => {
-                    // Handle any errors
-                    console.log(error);
-                });
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+  res.render('add_article', { title: 'Add Article' });
 });
 
+router.get('/about', (req, res) => {
+  res.render('about');
+});
 
-router.post('/edit/:id', (req, res) => {
-    let article = {};
-    article.title = req.body.title;
-    article.author = req.body.author;
-    article.body = req.body.Body;
+router.get('/contact', (req, res) => {
+  res.render('contact');
+});
 
-    console.log(article)
-        // console.log(req.body.title);
+// Add Article POST
+router.post('/add', [
+  body('title', 'Title is required').notEmpty(),
+  body('Body', 'Body is required').notEmpty(),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorMessages = errors.array().map(error => error.msg);
+    return res.status(400).render('add_article', {
+      title: 'Add Article',
+      errors: errorMessages,
+    });
+  }
 
-    Article.findOneAndUpdate({ _id: req.params.id }, { title: req.body.title, author: req.body.author, body: req.body.Body }, { new: true })
-        .then((updatedDocument) => {
-            // Handle the updated document
-            // req.flash('success', 'Article Updated');
-            res.redirect('/');
-            console.log(updatedDocument);
-        })
-        .catch((error) => {
-            // Handle any errors
+  try {
+    const article = new Article({
+      title: req.body.title,
+      author: req.user._id,
+      body: req.body.Body,
+    });
+    await article.save();
+    res.redirect('/');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
 
-            console.error(error);
-        });
+// Edit Article POST
+router.post('/edit/:id', async (req, res) => {
+  try {
+    const updatedDoc = await Article.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        title: req.body.title,
+        author: req.body.author,
+        body: req.body.Body,
+      },
+      { new: true }
+    );
+    res.redirect('/');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
 
+// View single article
+router.get('/:id', async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id).lean();
+    if (!article) return res.status(404).send('Article not found');
+    const user = await User.findById(article.author).lean();
+    res.render('article', {
+      article,
+      author: user ? user.name : 'Unknown',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
 
-    // article.collection.updateOne({ _id: req.params.id }, [{ title: req.body.title }, { author: req.body.author }, { body: req.body.body }])
-    //     .then(() => {
-    //         // console.log(result);
-    //         res.redirect('/')
-    //     })
-    //     .catch((error) => {
-    //         // Handle any errors
-    //         console.log(error);
-    //     });
-})
+// Edit article GET
+router.get('/edit/:id', ensureAuthentication, async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id).lean();
+    if (!article) return res.redirect('/');
+    if (article.author.toString() !== req.user.id) return res.redirect('/');
+    res.render('edit_article', { article });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
 
+// Delete article
+router.delete('/:id', async (req, res) => {
+  if (!req.user || !req.user._id) return res.status(403).send();
 
-
-
-router.get('/:id', (req, res) => {
-    Article.findById(req.params.id)
-        .then((article) => {
-            console.log(article);
-            User.findById(article.author)
-                .then((user) => {
-                    res.render('article', {
-                        article: article,
-                        author: user.name
-                    })
-                })
-
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-})
-
-//Load Edit Form
-router.get('/edit/:id', ensureAuthentication, (req, res) => {
-    Article.findById(req.params.id)
-        .then((article) => {
-            console.log(article);
-            if (article.author != req.user.id) {
-                res.redirect('/')
-            }
-            res.render('edit_article', {
-                article: article
-            })
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-})
-
-//Access Control
-function ensureAuthentication(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    } else {
-        res.redirect('/users/login');
+  try {
+    const article = await Article.findById(req.params.id);
+    if (!article || article.author.toString() !== req.user.id) {
+      return res.status(403).send();
     }
-}
-//Delete request
-router.delete('/:id', (req, res) => {
-
-    if (!req.user._id) {
-        res.status(500).send();
-    }
-    Article.findById(req.params.id)
-        .then((article) => {
-            if (article.author != req.user.id) {
-                res.status(500).send();
-            } else {
-                Article.deleteOne({ _id: req.params.id })
-                    .then(() => {
-                        console.log('Successful');
-                        res.sendStatus(200); // Send a success response if needed
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        res.sendStatus(500); // Send an error response if needed
-                    });
-            }
-        })
-        .catch((err) => {
-            console.log(err)
-        });
-
+    await Article.deleteOne({ _id: req.params.id });
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
+  }
 });
 
 module.exports = router;
